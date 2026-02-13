@@ -446,7 +446,7 @@ git commit -m "feat: add WebView detection, redirect logic, and fallback UI"
 
 ---
 
-### Task 4: Manual testing checklist
+### Task 4: Manual testing checklist [DONE]
 
 No code changes. Verify the completed page works correctly.
 
