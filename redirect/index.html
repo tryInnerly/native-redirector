@@ -212,7 +212,125 @@
         var $ = function (id) { return document.getElementById(id); };
         $('loader-text').textContent = funnel.text;
 
-        // ─── Detection + redirect logic will go here (Task 3) ───
+        var ua = navigator.userAgent || navigator.vendor || '';
+        var loaderEl = $('loader');
+        var fallbackEl = $('fallback');
+        var toast = $('toast');
+
+        // ─── WebView Detection ───
+        // Reference: index.html detection patterns
+        var apps = {
+            instagram: /Instagram/i,
+            facebook:  /FBAN|FBAV|FB_IAB|FB4A/i,
+            tiktok:    /TikTok|BytedanceWebview|musical_ly|trill/i,
+            twitter:   /Twitter/i,
+            snapchat:  /Snapchat/i,
+            pinterest: /Pinterest/i,
+            linkedin:  /LinkedInApp/i,
+            telegram:  /Telegram/i,
+            line:      /\bLine\//i,
+            wechat:    /MicroMessenger/i
+        };
+
+        var detectedApp = null;
+        for (var key in apps) {
+            if (apps[key].test(ua)) {
+                detectedApp = key;
+                break;
+            }
+        }
+
+        var isGenericWebview = false;
+        if (!detectedApp) {
+            if (/wv\)/.test(ua) && /Android/.test(ua)) isGenericWebview = true;
+            if (/Android.*Version\/[0-9]/.test(ua)) isGenericWebview = true;
+            if (/iPhone|iPad/.test(ua) && !/Safari/.test(ua)) isGenericWebview = true;
+            if (/\bWebView\b/i.test(ua)) isGenericWebview = true;
+        }
+
+        var isInApp = !!detectedApp || isGenericWebview;
+        var isIOS = /iPhone|iPad|iPod/.test(ua);
+        var isAndroid = /Android/.test(ua);
+
+        // ─── Native browser → immediate redirect ───
+        if (!isInApp) {
+            window.location.replace(targetUrl);
+            return;
+        }
+
+        // ─── In-app → attempt auto-redirect ───
+        if (isAndroid) {
+            // Intent URI (no package — opens default browser)
+            var strippedUrl = targetUrl.replace(/^https?:\/\//, '');
+            var intentUrl = 'intent://' + strippedUrl +
+                '#Intent;scheme=https;action=android.intent.action.VIEW;' +
+                'S.browser_fallback_url=' + encodeURIComponent(targetUrl) + ';end;';
+            window.location.replace(intentUrl);
+
+            // Button handler for manual retry
+            $('btn-open').addEventListener('click', function (e) {
+                e.preventDefault();
+                window.location.replace(intentUrl);
+            });
+        } else if (isIOS) {
+            // x-safari-https:// scheme
+            var safariUrl = 'x-safari-https://' + targetUrl.replace(/^https?:\/\//, '');
+            window.location.replace(safariUrl);
+
+            // Button handler — retry same scheme
+            $('btn-open').addEventListener('click', function (e) {
+                e.preventDefault();
+                window.location.replace(safariUrl);
+            });
+        } else {
+            // Unknown platform — button opens target directly
+            $('btn-open').addEventListener('click', function (e) {
+                e.preventDefault();
+                window.location.href = targetUrl;
+            });
+        }
+
+        // ─── Fallback: show buttons after 1.5s ───
+        setTimeout(function () {
+            loaderEl.style.display = 'none';
+            fallbackEl.className = 'fallback visible';
+        }, 1500);
+
+        // ─── Copy to clipboard ───
+        $('btn-copy').addEventListener('click', function () {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(targetUrl).then(function () {
+                    showToast();
+                }, function () {
+                    fallbackCopy();
+                });
+                return;
+            }
+            fallbackCopy();
+        });
+
+        function fallbackCopy() {
+            try {
+                var ta = document.createElement('textarea');
+                ta.value = targetUrl;
+                ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast();
+            } catch (e) {
+                window.prompt('Copy this link:', targetUrl);
+            }
+        }
+
+        function showToast() {
+            toast.className = 'toast show';
+            setTimeout(function () {
+                toast.className = 'toast';
+            }, 2000);
+        }
     })();
     </script>
 </body>
