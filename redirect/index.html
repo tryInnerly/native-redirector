@@ -180,7 +180,40 @@
     </noscript>
 
     <script>
-    // JS will be added in Task 2
+    (function () {
+        'use strict';
+
+        // ─── Funnel Config ───
+        var FUNNELS = {
+            iqtest16: {
+                text: 'Loading your IQ test',
+                url: 'https://quiz.tryinnerly.com/iqtest16'
+            },
+            _default: {
+                text: 'Loading your IQ test',
+                url: 'https://join.tryinnerly.com/iqtest13/'
+            }
+        };
+
+        // ─── Parse URL params ───
+        var params = new URLSearchParams(window.location.search);
+        var funnelKey = params.get('f') || '_default';
+        var funnel = FUNNELS[funnelKey] || FUNNELS._default;
+
+        // ─── Build target URL with forwarded params ───
+        params.delete('f');
+        var targetUrl = funnel.url;
+        var remaining = params.toString();
+        if (remaining) {
+            targetUrl += (targetUrl.indexOf('?') === -1 ? '?' : '&') + remaining;
+        }
+
+        // ─── Set loader text ───
+        var $ = function (id) { return document.getElementById(id); };
+        $('loader-text').textContent = funnel.text;
+
+        // ─── Detection + redirect logic will go here (Task 3) ───
+    })();
     </script>
 </body>
 </html>
