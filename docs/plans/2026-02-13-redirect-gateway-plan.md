@@ -1,5 +1,7 @@
 # Redirect Gateway Page — Implementation Plan
 
+Project: docs\plans\2026-02-13-redirect-gateway-design.md
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Create a minimal loader page (`redirect/index.html`) that redirects ad traffic from in-app WebViews to native browsers.
@@ -12,7 +14,7 @@
 
 ---
 
-### Task 1: Create redirect/index.html — HTML structure + CSS
+### Task 1: Create redirect/index.html — HTML structure + CSS [DONE]
 
 **Files:**
 - Create: `redirect/index.html`
@@ -233,7 +235,7 @@ git commit -m "feat: add redirect gateway page — HTML structure and CSS"
 
 ---
 
-### Task 2: Add JavaScript — config, URL parsing, parameter forwarding
+### Task 2: Add JavaScript — config, URL parsing, parameter forwarding [DONE]
 
 **Files:**
 - Modify: `redirect/index.html` (replace the `<script>` block)
@@ -293,7 +295,7 @@ git commit -m "feat: add funnel config and URL parameter parsing"
 
 ---
 
-### Task 3: Add JavaScript — WebView detection + redirect logic
+### Task 3: Add JavaScript — WebView detection + redirect logic [DONE]
 
 **Files:**
 - Modify: `redirect/index.html` (extend the `<script>` block)
