@@ -185,16 +185,26 @@
 
         // ─── Funnel Config ───
         var DEFAULT_URL = 'https://join.tryinnerly.com/iqtest13/';
-        var BASE_URL = 'https://join.tryinnerly.com/';
+        var FUNNEL_BASE = 'https://join.tryinnerly.com/';
+        var QUIZ_BASE = 'https://quiz.tryinnerly.com/';
         var LOADER_TEXT = 'Loading your IQ test';
 
         // ─── Parse URL params ───
         var params = new URLSearchParams(window.location.search);
+        var quizKey = params.get('q');
         var funnelKey = params.get('f');
 
-        // ─── Build target URL with forwarded params ───
+        // ─── Build target URL with forwarded params (?q takes priority) ───
+        params.delete('q');
         params.delete('f');
-        var targetUrl = funnelKey ? BASE_URL + funnelKey : DEFAULT_URL;
+        var targetUrl;
+        if (quizKey) {
+            targetUrl = QUIZ_BASE + quizKey;
+        } else if (funnelKey) {
+            targetUrl = FUNNEL_BASE + funnelKey;
+        } else {
+            targetUrl = DEFAULT_URL;
+        }
         var remaining = params.toString();
         if (remaining) {
             targetUrl += (targetUrl.indexOf('?') === -1 ? '?' : '&') + remaining;
