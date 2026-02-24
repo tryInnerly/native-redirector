@@ -249,18 +249,15 @@
                 window.location.replace(intentUrl);
             });
         } else if (isIOS) {
-            var safariUrl = 'x-safari-https://' + targetUrl.replace(/^https?:\/\//, '');
-            window.location.replace(safariUrl);
+            // Try Chrome first, fallback to opening in WebView
+            var chromeUrl = 'googlechromes://' + targetUrl.replace(/^https?:\/\//, '');
+            window.location.replace(chromeUrl);
 
-            $('btn-open').addEventListener('click', function (e) {
-                e.preventDefault();
-                window.location.replace(safariUrl);
-            });
+            setTimeout(function () {
+                window.location.replace(targetUrl);
+            }, 1500);
         } else {
-            $('btn-open').addEventListener('click', function (e) {
-                e.preventDefault();
-                window.location.href = targetUrl;
-            });
+            window.location.replace(targetUrl);
         }
 
         // ─── Fallback: show buttons after 1.5s ───
